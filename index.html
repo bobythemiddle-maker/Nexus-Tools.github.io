@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | MYP Modular Study Hub</title>
+    <!-- Tailwind CSS for clean layout & styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons for clean Apple-style iconography -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&display=swap');
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #000000;
+            color: #f5f5f7;
+            overflow-x: hidden;
+        }
+
+        /* Apple-style smooth transitions */
+        .page-transition {
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .blur-card {
+            background: rgba(22, 22, 23, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .active-nav {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+            border-radius: 10px;
+        }
+
+        /* Flashcard flip effect */
+        .flashcard-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flashcard-flipped {
+            transform: rotateY(180deg);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Global Sound Toggle Components -->
+    <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav" preload="auto"></audio>
+    <audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-84.wav" preload="auto"></audio>
+
+    <!-- Header / Navigation Bar -->
+    <header class="sticky top-0 z-50 w-full blur-card border-b border-neutral-900 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i data-lucide="layers" class="w-4 h-4 text-white"></i>
+            </div>
+            <span class="font-semibold text-lg tracking-tight bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">Nexus MYP</span>
+        </div>
+        
+        <!-- Navbar tabs -->
+        <nav class="hidden md:flex space-x-1 bg-neutral-900/60 p-1 rounded-full border border-neutral-800">
+            <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2 active-nav">
+                <i data-lucide="home" class="w-4 h-4"></i> Home
+            </button>
+            <button onclick="switchTab('subjects')" id="nav-subjects" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Subjects
+            </button>
+            <button onclick="switchTab('courses')" id="nav-courses" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2">
+                <i data-lucide="compass" class="w-4 h-4"></i> Courses
+            </button>
+            <button onclick="switchTab('flashcards')" id="nav-flashcards" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2">
+                <i data-lucide="copy" class="w-4 h-4"></i> Flashcards
+            </button>
+            <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4"></i> Quiz
+            </button>
+            <button onclick="switchTab('focus')" id="nav-focus" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2">
+                <i data-lucide="eye" class="w-4 h-4"></i> Focus
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn px-4 py-1.5 rounded-full text-sm font-medium text-neutral-400 hover:text-white transition duration-200 flex items-center gap-2">
+                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+            </button>
+        </nav>
+
+        <div class="flex items-center gap-3">
+            <span class="text-xs bg-neutral-900 border border-neutral-800 text-neutral-400 px-3 py-1 rounded-full uppercase tracking-wider font-semibold">MYP 1-3 Edition</span>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Interface Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-6 md:p-10">
+
+        <!-- ================= HOME PAGE ================= -->
+        <section id="page-home" class="page-transition space-y-8">
+            <div class="space-y-2">
+                <h1 class="text-4xl font-bold tracking-tight text-white md:text-5xl">Welcome back, Scholar</h1>
+                <p class="text-neutral-400 text-lg">Your targeted MYP3 curriculum is optimized and ready.</p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="blur-card p-6 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Current Streak</p>
+                        <p class="text-3xl font-bold mt-1 text-white">5 Days</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400"><i data-lucide="flame"></i></div>
+                </div>
+                <div class="blur-card p-6 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Concepts Mastered</p>
+                        <p class="text-3xl font-bold mt-1 text-white">24</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400"><i data-lucide="award"></i></div>
+                </div>
+                <div class="blur-card p-6 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Focus Minutes</p>
+                        <p class="text-3xl font-bold mt-1 text-white">120 mins</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400"><i data-lucide="clock"></i></div>
+                </div>
+            </div>
+
+            <!-- Dashboard Shortcuts -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="blur-card p-8 rounded-3xl flex flex-col justify-between space-y-6 hover:border-neutral-700 transition duration-300">
+                    <div class="space-y-2">
+                        <span class="text-xs font-semibold text-purple-400 tracking-widest uppercase">Active Recall</span>
+                        <h3 class="text-2xl font-bold text-white">Jump back into Quizzing</h3>
+                        <p class="text-neutral-400 text-sm">Test memory blocks with built-in honest review trackers like the new "I don't know" framework.</p>
+                    </div>
+                    <button onclick="switchTab('quiz')" class="w-full bg-white text-black font-medium py-3 rounded-xl hover:bg-neutral-200 transition duration-200 flex items-center justify-center gap-2">Start Quiz <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                </div>
+                <div class="blur-card p-8 rounded-3xl flex flex-col justify-between space-y-6 hover:border-neutral-700 transition duration-300">
+                    <div class="space-y-2">
+                        <span class="text-xs font-semibold text-blue-400 tracking-widest uppercase">Deep Focus</span>
+                        <h3 class="text-2xl font-bold text-white">Pomodoro Framework</h3>
+                        <p class="text-neutral-400 text-sm">Block distracting stimuli using clean visual countdowns tailored for targeted assignments.</p>
+                    </div>
+                    <button onclick="switchTab('focus')" class="w-full bg-neutral-900 border border-neutral-800 text-white font-medium py-3 rounded-xl hover:bg-neutral-800 transition duration-200 flex items-center justify-center gap-2">Launch Timer <i data-lucide="play" class="w-4 h-4"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SUBJECTS PAGE ================= -->
+        <section id="page-subjects" class="page-transition hidden space-y-8">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-white">MYP 1-3 Subject Sectors</h2>
+                <p class="text-neutral-400">Strictly isolated framework excluding high-level DP splits, PHE, design, or visual art variants.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 hover:scale-[1.02] transition duration-300 flex flex-col justify-between h-48">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-400 mb-4"><i data-lucide="book"></i></div>
+                        <h3 class="text-lg font-bold text-white">Language and Literature</h3>
+                        <p class="text-xs text-neutral-400 mt-1">Analyzing texts, global contexts, and creative writing frames.</p>
+                    </div>
+                    <span class="text-xs font-medium text-neutral-500 self-end">Group 1</span>
+                </div>
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 hover:scale-[1.02] transition duration-300 flex flex-col justify-between h-48">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400 mb-4"><i data-lucide="globe"></i></div>
+                        <h3 class="text-lg font-bold text-white">Language Acquisition</h3>
+                        <p class="text-xs text-neutral-400 mt-1">Phonetics, basic phase syntax structures, and oral prep.</p>
+                    </div>
+                    <span class="text-xs font-medium text-neutral-500 self-end">Group 2</span>
+                </div>
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 hover:scale-[1.02] transition duration-300 flex flex-col justify-between h-48">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 mb-4"><i data-lucide="users"></i></div>
+                        <h3 class="text-lg font-bold text-white">Individuals and Societies</h3>
+                        <p class="text-xs text-neutral-400 mt-1">Integrated Lower Humanities covering societies, time, and maps.</p>
+                    </div>
+                    <span class="text-xs font-medium text-neutral-500 self-end">Group 3</span>
+                </div>
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 hover:scale-[1.02] transition duration-300 flex flex-col justify-between h-48">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4"><i data-lucide="beaker"></i></div>
+                        <h3 class="text-lg font-bold text-white">Sciences</h3>
+                        <p class="text-xs text-neutral-400 mt-1">Integrated general science framework covering scientific investigations.</p>
+                    </div>
+                    <span class="text-xs font-medium text-neutral-500 self-end">Group 4</span>
+                </div>
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 hover:scale-[1.02] transition duration-300 flex flex-col justify-between h-48">
+                    <div>
+                        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-4"><i data-lucide="binary"></i></div>
+                        <h3 class="text-lg font-bold text-white">Mathematics</h3>
+                        <p class="text-xs text-neutral-400 mt-1">Algebraic frameworks, spatial geo, and introductory data processing.</p>
+                    </div>
+                    <span class="text-xs font-medium text-neutral-500 self-end">Group 5</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= COURSES PAGE ================= -->
+        <section id="page-courses" class="page-transition hidden space-y-8">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-white">Active Core Units</h2>
+                <p class="text-neutral-400">Targeted study roadmaps matching criteria-based evaluation benchmarks.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="blur-card p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-semibold text-emerald-400 px-2 py-0.5 rounded bg-emerald-500/10">Sciences</span>
+                        <h4 class="text-xl font-bold text-white mt-1">Unit 1: The Particle Model & States of Matter</h4>
+                        <p class="text-sm text-neutral-400 mt-0.5">Focusing on kinetic theory and physical changes.</p>
+                    </div>
+                    <div class="w-full md:w-48 bg-neutral-900 rounded-full h-2 overflow-hidden border border-neutral-800">
+                        <div class="bg-indigo-500 h-full rounded-full" style="width: 75%"></div>
+                    </div>
+                </div>
+                <div class="blur-card p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-semibold text-indigo-400 px-2 py-0.5 rounded bg-indigo-500/10">Mathematics</span>
+                        <h4 class="text-xl font-bold text-white mt-1">Unit 2: Linear Equations & Coordinate Geometry</h4>
+                        <p class="text-sm text-neutral-400 mt-0.5">Understanding slopes, axes plots, and balance methodologies.</p>
+                    </div>
+                    <div class="w-full md:w-48 bg-neutral-900 rounded-full h-2 overflow-hidden border border-neutral-800">
+                        <div class="bg-indigo-500 h-full rounded-full" style="width: 40%"></div>
+                    </div>
+                </div>
+                <div class="blur-card p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-semibold text-amber-400 px-2 py-0.5 rounded bg-amber-500/10">Individuals & Societies</span>
+                        <h4 class="text-xl font-bold text-white mt-1">Unit 1: Ancient Civilizations & Trade Routing</h4>
+                        <p class="text-sm text-neutral-400 mt-0.5">Examining systemic growth along resource-rich valleys.</p>
+                    </div>
+                    <div class="w-full md:w-48 bg-neutral-900 rounded-full h-2 overflow-hidden border border-neutral-800">
+                        <div class="bg-indigo-500 h-full rounded-full" style="width: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= FLASHCARDS PAGE ================= -->
+        <section id="page-flashcards" class="page-transition hidden space-y-8">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-white">Active Recall Flashcards</h2>
+                <p class="text-neutral-400">Click the modular card canvas to smoothly reveal hidden terminal definitions.</p>
+            </div>
+
+            <div class="flex flex-col items-center justify-center space-y-6">
+                <div onclick="flipCard()" class="w-full max-w-xl h-64 cursor-pointer perspective group">
+                    <div id="flashcardElement" class="flashcard-inner w-full h-full relative rounded-3xl blur-card border border-neutral-800 flex items-center justify-center p-8 text-center text-xl font-medium shadow-2xl">
+                        <div id="cardFront" class="absolute backface-hidden text-white flex flex-col items-center space-y-3">
+                            <span class="text-xs text-neutral-500 font-bold tracking-widest uppercase">Integrated Sciences Term</span>
+                            <p class="text-2xl font-semibold">What is a 'Sublimation' process?</p>
+                            <span class="text-xs text-indigo-400 mt-4 flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Click canvas to flip</span>
+                        </div>
+                        <div id="cardBack" class="absolute backface-hidden text-neutral-300 rotate-y-180 px-6 flex flex-col items-center space-y-3" style="transform: rotateY(180deg);">
+                            <span class="text-xs text-emerald-400 font-bold tracking-widest uppercase">Answer / Definition</span>
+                            <p class="text-xl">The transition of a substance directly from the solid to the gas phase, bypassing the liquid state entirely.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="changeFlashcard('prev')" class="p-3 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-800 transition"><i data-lucide="chevron-left"></i></button>
+                    <button onclick="changeFlashcard('next')" class="p-3 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white border border-neutral-800 transition"><i data-lucide="chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= QUIZ PAGE ================= -->
+        <section id="page-quiz" class="page-transition hidden space-y-8">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-white">Dynamic Concept Quiz</h2>
+                <p class="text-neutral-400">Includes an explicit **"I don't know"** bypass path to prevent guesswork data skew.</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto blur-card p-8 rounded-3xl space-y-8 border border-neutral-800">
+                <div class="flex justify-between items-center text-xs text-neutral-400 font-semibold tracking-wider">
+                    <span>MATHEMATICS ASSIGNMENT</span>
+                    <span>QUESTION 1 OF 3</span>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-2xl font-bold text-white">If 3x + 7 = 22, what is the calculated value of x?</h3>
+                    <p class="text-sm text-neutral-400">Solve the linear step using standard isolation frameworks.</p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="selectQuizOption(this, false)" class="w-full text-left p-4 rounded-xl bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300 border border-neutral-800 hover:border-neutral-700 transition duration-200">
+                        A. x = 3
+                    </button>
+                    <button onclick="selectQuizOption(this, true)" class="w-full text-left p-4 rounded-xl bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300 border border-neutral-800 hover:border-neutral-700 transition duration-200">
+                        B. x = 5
+                    </button>
+                    <button onclick="selectQuizOption(this, false)" class="w-full text-left p-4 rounded-xl bg-neutral-900/40 hover:bg-neutral-900 text-neutral-300 border border-neutral-800 hover:border-neutral-700 transition duration-200">
+                        C. x = 4.5
+                    </button>
+                    
+                    <button onclick="selectQuizOption(this, 'idk')" class="w-full text-left p-4 rounded-xl bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 transition duration-200 flex justify-between items-center mt-4">
+                        <span>I don't know the step yet</span>
+                        <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div id="quizFeedback" class="hidden p-4 rounded-xl text-center font-medium text-sm"></div>
+            </div>
+        </section>
+
+        <!-- ================= FOCUS PAGE ================= -->
+        <section id="page-focus" class="page-transition hidden space-y-8">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-white">Distraction-Free Timer</h2>
+                <p class="text-neutral-400">Simple interval clocks to sustain deep engagement cycles during study routines.</p>
+            </div>
+
+            <div class="max-w-md mx-auto blur-card p-10 rounded-3xl text-center space-y-8 border border-neutral-800">
+                <span class="text-xs font-bold text-indigo-400 tracking-widest uppercase">POMODORO DECK</span>
+                
+                <div id="timerDisplay" class="text-6xl font-light text-white tracking-tight">25:00</div>
+
+                <div class="flex justify-center gap-4">
+                    <button onclick="toggleTimer()" id="timerControlBtn" class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm shadow hover:bg-neutral-200 transition flex items-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4"></i> Start Session
+                    </button>
+                    <button onclick="resetTimer()" class="px-6 py-2.5 rounded-full bg-neutral-900 text-neutral-300 font-medium text-sm border border-neutral-800 hover:bg-neutral-800 transition flex items-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SETTINGS PAGE ================= -->
+        <section id="page-settings" class="page-transition hidden space-y-8">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold tracking-tight text-white">System Settings</h2>
+                <p class="text-neutral-400">Configure layout themes, system audio states, and Gemini API pattern controls.</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto space-y-6">
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="cpu" class="text-indigo-400"></i> Gemini API Configurations</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase mb-2">Private Access API Key</label>
+                            <input type="password" placeholder="AIzaSy..." class="w-full bg-black border border-neutral-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-600 transition">
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <div>
+                                <h5 class="text-sm font-medium text-white">Pattern Recognition Scheduling</h5>
+                                <p class="text-xs text-neutral-500">Allow AI systems to predict study pacing spikes based on error frequencies.</p>
+                            </div>
+                            <input type="checkbox" checked class="w-4 h-4 accent-indigo-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="blur-card p-6 rounded-2xl border border-neutral-800 space-y-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="volume-2" class="text-purple-400"></i> Interface Customization</h3>
+                    <div class="flex items-center justify-between py-2">
+                        <div>
+                            <h5 class="text-sm font-medium text-white">Haptic Audio Profiles</h5>
+                            <p class="text-xs text-neutral-500">Play subtle, low-frequency click alerts during dashboard tab navigation shifts.</p>
+                        </div>
+                        <input type="checkbox" id="soundToggle" checked class="w-4 h-4 accent-indigo-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="w-full py-6 text-center text-xs text-neutral-600 border-t border-neutral-950 blur-card">
+        &copy; 2026 Nexus Educational Systems. True Dark Interface Sandbox.
+    </footer>
+
+    <script>
+        // System Sound Handler
+        function triggerSound(type) {
+            const soundsActive = document.getElementById('soundToggle').checked;
+            if (!soundsActive) return;
+
+            if (type === 'click') {
+                const clickSnd = document.getElementById('clickSound');
+                clickSnd.currentTime = 0;
+                clickSnd.volume = 0.2;
+                clickSnd.play().catch(() => {});
+            } else if (type === 'success') {
+                const successSnd = document.getElementById('successSound');
+                successSnd.currentTime = 0;
+                successSnd.volume = 0.3;
+                successSnd.play().catch(() => {});
+            }
+        }
+
+        // SPA Page Router Navigation System
+        function switchTab(targetTabId) {
+            triggerSound('click');
+            
+            // Collect all screen sections
+            const pages = document.querySelectorAll('main > section');
+            pages.forEach(page => {
+                page.classList.add('hidden');
+            });
+
+            // Make designated canvas screen transparently slide open
+            const targetPage = document.getElementById(`page-${targetTabId}`);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+            }
+
+            // Reposition highlight indicators across nav element list items
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => {
+                btn.classList.remove('active-nav');
+            });
+
+            const activeBtn = document.getElementById(`nav-${targetTabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active-nav');
+            }
+        }
+
+        // Active Recall Flashcards State Tracking
+        function flipCard() {
+            triggerSound('click');
+            const card = document.getElementById('flashcardElement');
+            card.classList.toggle('flashcard-flipped');
+        }
+
+        const cardsPool = [
+            { q: "What is a 'Sublimation' process?", a: "The transition of a substance directly from the solid to the gas phase, bypassing the liquid state entirely." },
+            { q: "Define an 'Acute Angle' in Geometry.", a: "An angle that measures strictly less than 90 degrees." },
+            { q: "What is an 'Artefact' in Humanities?", a: "An object made by a human being, typically of cultural or historical interest." }
+        ];
+        let currentCardIndex = 0;
+
+        function changeFlashcard(direction) {
+            triggerSound('click');
+            const card = document.getElementById('flashcardElement');
+            // Reset flipped state first
+            card.classList.remove('flashcard-flipped');
+
+            setTimeout(() => {
+                if (direction === 'next') {
+                    currentCardIndex = (currentCardIndex + 1) % cardsPool.length;
+                } else {
+                    currentCardIndex = (currentCardIndex - 1 + cardsPool.length) % cardsPool.length;
+                }
+                document.querySelector('#cardFront p').innerText = cardsPool[currentCardIndex].q;
+                document.querySelector('#cardBack p').innerText = cardsPool[currentCardIndex].a;
+            }, 200);
+        }
+
+        // Quiz Selection Logical Handlers (Honest Feedback Integration)
+        function selectQuizOption(buttonElement, outcomeState) {
+            const feedbackBox = document.getElementById('quizFeedback');
+            feedbackBox.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'bg-rose-500/10', 'text-rose-400', 'bg-amber-500/10', 'text-amber-400');
+            
+            if (outcomeState === 'idk') {
+                triggerSound('click');
+                feedbackBox.innerText = "Concept flagged for localized review. Your tutor will be updated to prioritize line-by-line resolution.";
+                feedbackBox.classList.add('block', 'bg-amber-500/10', 'text-amber-400');
+            } else if (outcomeState === true) {
+                triggerSound('success');
+                feedbackBox.innerText = "Excellent. Step correct! Mastered credit logged.";
+                feedbackBox.classList.add('block', 'bg-emerald-500/10', 'text-emerald-400');
+            } else {
+                triggerSound('click');
+                feedbackBox.innerText = "Incorrect answer calculation. Try re-evaluating equations or flag via tracking cards.";
+                feedbackBox.classList.add('block', 'bg-rose-500/10', 'text-rose-400');
+            }
+        }
+
+        // Pomodoro Clock Engine 
+        let timerInstance = null;
+        let runningState = false;
+        let totalTimeSeconds = 25 * 60;
+
+        // Ensure update timer displays initially
+        updateTimerInterfaceDisplay();
+
+        function toggleTimer() {
+            triggerSound('click');
+            const controlBtn = document.getElementById('timerControlBtn');
+            
+            if (runningState) {
+                clearInterval(timerInstance);
+                runningState = false;
+                controlBtn.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Resume Session`;
+            } else {
+                runningState = true;
+                controlBtn.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i> Pause Session`;
+                timerInstance = setInterval(() => {
+                    if (totalTimeSeconds <= 0) {
+                        clearInterval(timerInstance);
+                        triggerSound('success');
+                        alert("Session complete! Time for a short break.");
+                        resetTimer();
+                    } else {
+                        totalTimeSeconds--;
+                        updateTimerInterfaceDisplay();
+                    }
+                }, 1000);
+            }
+            lucide.createIcons();
+        }
+
+        function resetTimer() {
+            triggerSound('click');
+            clearInterval(timerInstance);
+            runningState = false;
+            totalTimeSeconds = 25 * 60;
+            updateTimerInterfaceDisplay();
+            document.getElementById('timerControlBtn').innerHTML = `<i data-lucide="play" class="w-4 h-4"></i> Start Session`;
+            lucide.createIcons();
+        }
+
+        function updateTimerInterfaceDisplay() {
+            const minutesLeft = Math.floor(totalTimeSeconds / 60);
+            const secondsLeft = totalTimeSeconds % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${minutesLeft.toString().padStart(2, '0')}:${secondsLeft.toString().padStart(2, '0')}`;
+        }
+
+        // Initialize clean vectorized vector icon rendering sets 
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
